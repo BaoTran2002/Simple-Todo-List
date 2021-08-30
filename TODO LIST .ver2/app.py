@@ -1,25 +1,26 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 
+# Config app with DB & Flask
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
+# Create DBModel
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=True)
     complete = db.Column(db.Boolean)
 
-
+# Get default page
 @app.route("/")
 def index():
     # flash('You were successfully logged in')
     todo_list = Todo.query.order_by(Todo.name)
     return render_template("index.html", message="Welcome", todo_list=todo_list)
 
-
+# Add an Item then insert to DB -> restart the page it-self
 @app.route("/add", methods=["POST"])
 def add():
     # flash('You were successfully added')
@@ -29,7 +30,7 @@ def add():
     db.session.commit()
     return redirect("/")
 
-
+# Update an Item and add to DB -> restart the page it-self
 @app.route("/update/<int:todo_id>")
 def upadate(todo_id):
     # flash('You were successfully updated')
@@ -38,7 +39,7 @@ def upadate(todo_id):
     db.session.commit()
     return redirect("/")
 
-
+# Delete an Item from DB
 @app.route("/delete/<int:todo_id>")
 def delete(todo_id):
     # flash('You were successfully deleted')
